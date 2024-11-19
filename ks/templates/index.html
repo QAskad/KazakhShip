@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Welcome to the Library</h1>
+    <h2>Popular Files</h2>
+    <ul>
+        {% for file in popular_files %}
+            <li>
+                <h3>{{ file.title }}</h3>
+                <p>Author: {{ file.author }}</p>
+                <p>Genre: {{ file.genre }}</p>
+                <button onclick="window.location.href='{{ url_for('api.download_file', file_id=file.id) }}'">Download</button>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,68 @@
+<!-- account.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Account</title>
+</head>
+<body>
+    <h2>Welcome, {{ current_user.username }}!</h2>
+
+    <h3>Your Uploaded Files</h3>
+    <ul id="user-uploaded-files">
+        <!-- List of uploaded files will be shown here -->
+    </ul>
+
+    <h3>Your Downloaded Files</h3>
+    <ul id="user-downloaded-files">
+        <!-- List of downloaded files will be shown here -->
+    </ul>
+
+    <script>
+        // Fetch the list of uploaded files via the API
+        fetch('/api/account/uploads', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('authToken')  // Assuming the user is authenticated and we store the token in localStorage
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const fileList = document.getElementById('user-uploaded-files');
+            data.forEach(file => {
+                let listItem = document.createElement('li');
+                listItem.textContent = file.title;
+                // Create a download link for each file
+                let downloadLink = document.createElement('a');
+                downloadLink.href = `/api/files/${file.id}/download`;
+                downloadLink.textContent = 'Download';
+                listItem.appendChild(downloadLink);
+                fileList.appendChild(listItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+        // Fetch the list of downloaded files via the API
+        fetch('/api/account/downloads', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const downloadedFilesList = document.getElementById('user-downloaded-files');
+            data.forEach(file => {
+                let listItem = document.createElement('li');
+                listItem.textContent = file.title;
+                downloadedFilesList.appendChild(listItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading downloaded files:', error);
+        });
+    </script>
+</body>
+</html>

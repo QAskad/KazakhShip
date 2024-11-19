@@ -1,0 +1,72 @@
+<!-- upload.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload File</title>
+</head>
+<body>
+    <h2>Upload File</h2>
+    <form action="/api/files/upload" method="POST" enctype="multipart/form-data">
+        <label for="file">Select file to upload:</label>
+        <input type="file" name="file" id="file" required>
+        <input type="text" name="title" placeholder="File title" required>
+        <input type="text" name="genre" placeholder="Genre" required>
+        <input type="text" name="subgenre" placeholder="Subgenre">
+        <button type="submit">Upload</button>
+    </form>
+
+    <h3>Uploaded Files</h3>
+    <ul id="uploaded-files">
+        <!-- List of uploaded files will be shown here -->
+    </ul>
+
+    <script>
+        // AJAX file upload
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+            fetch('/api/files/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    // Optionally, reload the uploaded files list here
+                    loadUploadedFiles();
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error uploading file');
+            });
+        });
+
+        // Load uploaded files list
+        function loadUploadedFiles() {
+            fetch('/api/account/uploads')
+            .then(response => response.json())
+            .then(data => {
+                const uploadedFilesList = document.getElementById('uploaded-files');
+                uploadedFilesList.innerHTML = ''; // Clear the existing list
+                data.forEach(file => {
+                    let listItem = document.createElement('li');
+                    listItem.textContent = file.title;
+                    uploadedFilesList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading uploaded files:', error);
+            });
+        }
+
+        // Load the files when the page is loaded
+        window.onload = loadUploadedFiles;
+    </script>
+</body>
+</html>
